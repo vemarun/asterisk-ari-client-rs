@@ -43,4 +43,7 @@ pub trait ChannelsAPI {
         if_exists:Option<&str>,
         beep: Option<bool>,
     )->Result<()>;
+
+    // Function to send dtmf to channel using channel post dtmf api
+    async fn raise_dtmf(&self, channel_id: &str, dtmf: &str, before: Option<usize>, between: Option<usize>, duration: Option<usize>, after: Option<usize>) -> Result<()>;
 }
