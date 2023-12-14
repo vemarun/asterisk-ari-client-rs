@@ -24,9 +24,12 @@ fn stasis_start(event: StasisStart) {
         ARICLIENT.answer(&event.channel.id).await.unwrap();
         // do the recording
         ARICLIENT
-            .record(&event.channel.id, None, None, None, None, None, None, None)
+            .record(&event.channel.id, None, None, Some("*"), None, None, None, None)
             .await
             .unwrap();
+        // dtmf test
+        sleep(Duration::from_millis(20000)).await;
+        ARICLIENT.raise_dtmf(&event.channel.id, "*", None, None, None, None).await.unwrap();
         debug!("Channel {} answered!", &event.channel.id);
     });
 }

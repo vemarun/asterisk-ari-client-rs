@@ -568,4 +568,44 @@ impl ChannelsAPI for AriClient {
         eval_status_code!(status, StatusCode::CREATED, Some(body_str));
         Ok(())
     }
+
+    async fn raise_dtmf(
+        &self,
+        channel_id: &str,
+        dtmf: &str,
+        before: Option<usize>,
+        between: Option<usize>,
+        duration: Option<usize>,
+        after: Option<usize>,
+    ) -> Result<()> {
+        let req_body = format!(
+            r#"
+            {{
+                "dtmf": "{_dtmf_}",
+                "before": {_before_},
+                "between": {_between_},
+                "duration": {_duration_},
+                "after": {_after_}
+            }}
+            "#,
+            _dtmf_ = dtmf,
+            _before_ = before.unwrap_or(0),
+            _between_ = between.unwrap_or(100),
+            _duration_ = duration.unwrap_or(100),
+            _after_ = after.unwrap_or(0),
+        );
+
+        let resp = HTTP_CLIENT
+            .post(format!("{}/channels/{}/dtmf", self.url, channel_id))
+            .headers(self.get_common_headers()?)
+            .body(req_body)
+            .send()
+            .await?;
+
+        let status = resp.status();
+        let body_str = resp.text().await?;
+
+        eval_status_code!(status, StatusCode::NO_CONTENT, Some(body_str));
+        Ok(())
+    }
 }
